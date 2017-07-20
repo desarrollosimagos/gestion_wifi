@@ -1,0 +1,301 @@
+{% extends 'base/base.html' %}
+{% block contenido %}
+
+
+<script src="http://code.highcharts.com/highcharts.js"></script>
+
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+        
+        $('#boton1').click(function(){
+            alert("hola")
+            var data_send = $.param({accion: 'autoincrementado', 'csrfmiddlewaretoken': "{{ csrf_token }}"});
+            $.post("", data_send, function (data) {
+                //var aumento = data[0]['aumento']
+                //$("span#total_general").text(aumento)
+            });
+        })
+        
+        
+        setInterval(function () { // Intervalo de tiempo
+            
+            
+            var data_send = $.param({accion: 'total_general', 'csrfmiddlewaretoken': "{{ csrf_token }}"});
+            $.post("", data_send, function (data) {
+                var aumento = data[0]['aumento']
+                $("span#total_general").text(aumento)
+            });
+            
+            var data_send = $.param({accion: 'cantidad_actual', 'csrfmiddlewaretoken': "{{ csrf_token }}"});
+            $.post("", data_send, function (data) {
+                var cantidad_total = data[0]['cantidad']
+                $("span#total").text(cantidad_total)
+            });
+            
+            //  =============== Proceso para reflejar la cantidad maxima registrada ================
+            var data_send = $.param({accion: 'mostrar_cantidad', 'csrfmiddlewaretoken': "{{ csrf_token }}"});
+            $.post("", data_send, function (data) {
+                var cantidad = data[0]['cantidad']
+                $("span#total_actual").text(cantidad)
+            });
+            
+            //  ============ Proceso para reflejar la cantidad de usuarios conectados ================
+            var data_send = $.param({accion: 'mostrar_total_s_b', 'csrfmiddlewaretoken': "{{ csrf_token }}"});
+            $.post("", data_send, function (data) {
+                var subida = data[0]['subida']
+                var bajada = data[0]['bajada']
+                $("span#bajada").text(bajada)
+                $("span#subida").text(subida)
+            });
+            
+            // ======================= Proceso de graficar los resultados =========================
+            var data_send = $.param({accion: 'mostrar', 'csrfmiddlewaretoken': "{{ csrf_token }}"});
+            
+            $.post("", data_send, function (data) {
+                
+                var lista_json = []
+                var lista_json2 = []
+                var lista_json3 = []
+                var total_can = 0;
+                $.each(data, function(i){
+                    cand = []
+                    total_can += data[i].total    
+                })
+                var voto_cand = 0;
+                $.each(data, function(i, obj){
+
+                    cand = []
+                    //cand[0] = data[i].cantidad
+                    cand[0] = (data[i].bajada_usu) / 1000
+                    
+                    cand2 =[]
+                    //cand2[0] = data[i].cantidad
+                    cand2[0] = (data[i].subida_usu) / 1000
+                    
+                    cand3 =[]
+                    //cand2[0] = data[i].cantidad
+                    cand3[0] = data[i].hora
+                    
+                    
+                    
+                    lista_json.push(cand);
+                    lista_json2.push(cand2);
+                    lista_json3.push(cand3);
+                })
+                
+                
+                $('#container').highcharts({
+                    chart: {
+                        type: 'spline'
+                    },
+                    title: {
+                        text: 'Flujo de conexiones wifi'
+                    },
+                    subtitle: {
+                        text: 'Wifi Expo Aragua Potencia 2016'
+                    },
+                    xAxis: {
+                        //type: 'datetime',
+                        categories: lista_json3,
+                        labels: {
+                            overflow: 'justify'
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Consumo de Mb/s'
+                        }, 
+                    },
+                    tooltip: {
+                        valueSuffix: ' Mb/s'
+                    },
+                    plotOptions: {
+                        spline: {
+                            lineWidth: 4,
+                            states: {
+                                hover: {
+                                    lineWidth: 5
+                                }
+                            },
+                            marker: {
+                                enabled: false
+                            },
+                            //pointInterval: 3600000, // one hour
+                            //pointStart: Date.UTC(2016, 9, 4, 0, 0, 0)
+                        }
+                    },
+                    series: [{
+                        name: 'Mb/s Bajada',
+                        data: lista_json
+                    }, {
+                        name: 'Mb/s Subida',
+                        data: lista_json2
+                    }],
+                    navigation: {
+                        menuItemStyle: {
+                            fontSize: '10px'
+                        }
+                    }
+                });
+               
+            });
+            
+            // ====================================================================================
+
+        }, 5000);
+        
+        setInterval(function(){
+            
+            var data_send = $.param({accion: 'graficaauto', 'csrfmiddlewaretoken': "{{ csrf_token }}"});
+            
+            $.post("", data_send, function (data) {
+                
+                var lista_json4 = []
+                var lista_json5 = []
+                var total_can = 0;
+
+                $.each(data, function(i, obj){
+
+                    cand4 = []
+                    cand4[0] = data[i].cantidad
+                    
+                    cand5 = []
+                    cand5[0] = data[i].hora
+                    lista_json4.push(cand4);
+                    lista_json5.push(cand5);
+
+                })
+                $('#container2').highcharts({
+                    chart: {
+                        zoomType: 'x'
+                    },
+                    title: {
+                        text: 'Frecuencia de la señal'
+                    },
+                    subtitle: {
+                        text: 'Wifi Expo Aragua Potencia 2016'
+                    },
+                    xAxis: {
+                        //type: 'datetime'
+                        categories: lista_json5,
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Frecuencia de datos'
+                        }
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    plotOptions: {
+                        area: {
+                            fillColor: {
+                                linearGradient: {
+                                    x1: 0,
+                                    y1: 0,
+                                    x2: 0,
+                                    y2: 1
+                                },
+                                stops: [
+                                    [0, Highcharts.getOptions().colors[0]],
+                                    [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                                ]
+                            },
+                            marker: {
+                                radius: 2
+                            },
+                            lineWidth: 1,
+                            states: {
+                                hover: {
+                                    lineWidth: 1
+                                }
+                            },
+                            threshold: null
+                        }
+                    },
+        
+                    series: [{
+                        type: 'area',
+                        name: 'USD to EUR',
+                        data: lista_json4
+                    }]
+                });
+            });
+            
+        },5000);
+        
+        //setInterval(function(){
+            
+        //    var data_send = $.param({accion: 'autoincrementado', 'csrfmiddlewaretoken': "{{ csrf_token }}"});
+        //    $.post("", data_send, function (data) {
+        //        //var aumento = data[0]['aumento']
+        //        //$("span#total_general").text(aumento)
+        //    });
+        //    
+        //},5000);
+        
+    
+    });
+
+</script>
+<style>
+    #wrapper{
+        font:normal 60pt Arial;
+        color:#FFFFFF;
+        text-shadow: 0 1px 0 #ccc,
+        0 2px 0 #c9c9c9,
+        0 3px 0 #bbb,
+        0 4px 0 #b9b9b9,
+        0 5px 0 #aaa,
+        0 6px 1px rgba(0,0,0,.1),
+        0 0 5px rgba(0,0,0,.1),
+        0 1px 3px rgba(0,0,0,.3),
+        0 3px 5px rgba(0,0,0,.2),
+        0 5px 10px rgba(0,0,0,.25),
+        0 10px 10px rgba(0,0,0,.2),
+        0 20px 20px rgba(0,0,0,.15);
+    }
+</style>
+
+<body style="background-image: url({{ STATIC_URL }}image/FONDO-WIFI-AZUL1.jpg); background-size: 100%; background-repeat: no-repeat">
+    <!--<button id="boton1">asdad</button>-->
+    <br/>
+    <br/>
+    
+    <form method="post" id="form_cantidad" class="form-horizontal">
+        {% csrf_token %}
+        <center>
+            
+            <div style='width:90%'>
+                <div class="form-group col-xs-12" >
+                    <div class="form-group col-xs-6" style="font-size: 70px; color: red" id="wrapper">
+                        <span id='total'></span> Usuarios Conectados
+                    </div>
+                    <div class="form-group col-xs-6" style="font-size: 25px; ">
+                        <div class="form-group col-xs-11" style="text-align: left">
+                            Cantidad de kb/s de Bajada <span style="color: red" id='bajada'></span> kb/s
+                            <br>
+                            Cantidad de kb/s de Subida <span style="color: red" id='subida'></span> kb/s
+                            <br>
+                            Máximo de Usuarios: <span style="color: red" id='total_actual'></span>
+                            <br>
+                            Cantidad Total de Usuarios: <span style="color: red" id='total_general'></span>
+                        </div>
+                        <div class="form-group col-xs-1" >
+                            <img src="{{STATIC_URL}}image/mundo.gif"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-xs-12 " style="font-size: 100px;text-align: center">
+                    <div id="container" class="col-xs-12 " style="min-width: 155px; height: 400px; margin: 0 auto"></div>
+                    <!--<div id="container2" class="col-xs-6 " style="min-width: 155px; height: 400px; margin: 0 auto"></div>-->
+                </div>
+            </div>
+            
+
+                
+    </form>
+</body>
+{% endblock %}

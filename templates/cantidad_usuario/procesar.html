@@ -1,0 +1,264 @@
+{% extends 'base/base.html' %}
+{% block contenido %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        var startDate = new Date('01/01/2016');
+		var FromEndDate = new Date();
+		var ToEndDate = new Date();
+		
+		ToEndDate.setDate(ToEndDate.getDate()+365);
+		
+		$('#from_date').datepicker({
+			format: "dd-mm-yyyy",
+			endDate: FromEndDate,
+			language: "es",
+			//startView: 1,
+			autoclose: true,
+			startDate: "-1y"
+		})
+			.on('changeDate', function(selected){
+			startDate = new Date(selected.date.valueOf());
+			startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+			$('#to_date').datepicker('setStartDate', startDate);
+			}); 
+		$('#to_date').datepicker({
+				format: "dd-mm-yyyy",
+				startDate: startDate,
+				endDate: "today",
+				autoclose: true,
+				language: "es"
+			}).on('changeDate', function(selected){
+				FromEndDate = new Date(selected.date.valueOf());
+				FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+				$('#from_date').datepicker('setEndDate', FromEndDate);
+			});
+        $("input,select,textarea").change(function () {
+            $('input,select,textarea').parent('div').removeClass('has-error');
+        });
+        
+        $(".borrar_data").click(function () {
+            bootbox.dialog({
+				message: "¿Esta seguro que desea eliminar los datos",
+				title: "Eliminar tabla",
+				buttons: {
+					success: {
+						label: "Descartar",
+						className: "btn-primary",
+						callback: function () {
+							// Se detiene el proceso
+						}
+					},
+                    danger: {
+                        label: "Procesar",
+                        className: "btn-warning",
+                        callback: function () {
+                            
+							// Proceso de borrado
+                            var data = $.param({accion: 'depurar_data', 'csrfmiddlewaretoken': "{{ csrf_token }}"});
+                            $.post("", data, function (response) {
+                                    if (response == 'depurar') {
+                                        bootbox.alert("Se proceso la petición", function () {
+                                            window.location = '/cantidad'
+                                        });
+                                    }
+                            });
+							
+							
+                        }
+                    }
+				}
+			});
+        });
+        
+        // Evento para reflejar desde la lista de usuarios, los datos correspondientes
+        $("table#list_cantidad tbody tr td").on('click', 'img.modificar', function () {
+            var aPos = Lcantidad.fnGetPosition(this.parentNode.parentNode);
+            var oData = Lcantidad.fnGetData(aPos);
+            $("#cantidad").val(oData[1].trim()).attr('readonly','true');
+            $("#estado").val(oData[2].trim());
+            $("#valor").val(oData[3].trim());
+            $("#registrar").text("Actualizar");
+        });
+
+        var Lcantidad = $('#list_cantidad').dataTable({
+			"paging": true,
+			"lengthChange": false,
+			"autoWidth": false,
+			"searching": false,
+			"ordering": true,
+			"info": true,
+			"iDisplayLength": 15,
+			"iDisplayStart": 0,
+            "oLanguage": {"sUrl": "/static/js/es.txt"},
+            "aoColumns": [
+                {"sClass": "registro center", "sWidth": "25%"},
+                {"sClass": "registro center", "sWidth": "25%"},
+                {"sClass": "registro center", "sWidth": "25%"},
+                {"sClass": "registro center", "sWidth": "25%"},
+            ]
+        });
+
+
+
+        // Validamos los campos del formulario
+        $("#registrar").click(function (e) {
+            e.preventDefault();  // Para evitar que se envíe por defecto
+            
+            if ($('#cantidad').val().trim() == '' || $('#cantidad').val().trim() == 0) {
+
+                bootbox.alert("Indique la cantidad", function () {
+                }).on('hidden.bs.modal', function (event) {
+                    $("#cantidad").parent('div').addClass('has-error')
+                    $('#cantidad').val('')
+                    $("#cantidad").focus();
+                });
+
+            } else if ($('#aumento').val().trim() == '' || $('#aumento').val().trim() == 0) {
+                bootbox.alert("Indique el Aumento", function () {
+                    }).on('hidden.bs.modal', function (event) {
+                        $("#aumento").parent('div').addClass('has-error')
+                        $('#aumento').val('')
+                        $("#aumento").focus();
+                    }); 
+                //code
+            }
+            else {
+
+                if ($("#valor").val() == "") {
+                    //alert("Vacio");
+                    var data_send = $('#form_cantidad').serialize() + '&' + $.param({accion: 'guardar', 'csrfmiddlewaretoken': "{{ csrf_token }}"});
+                    //alert(data_send)
+                } else {
+                    var data_send = $('#form_cantidad').serialize() + '&' + $.param({accion: 'editar', 'csrfmiddlewaretoken': "{{ csrf_token }}"});
+                    //alert("MOD: "+data_send)
+                }
+
+                $.post("", data_send, function (response) {
+                    if (response == 'add') {
+                        bootbox.alert("Su Registro fue Exitoso ", function () {
+                            window.location = '/cantidad'
+                        });
+                    }
+                });
+            }
+        });
+        //
+        //$('#nuevo').click(function () {
+        //    $("input").val("").removeAttr('readonly', 'true');
+        //    $("#registrar").text("Registrar");
+        //    $("#nuevo").val("Limpiar");
+        //    $("#valor").val("");
+        //    $("#cantidad").val("");
+        //    $("#cantidad").focus();
+        //});
+		
+		$('#pdf_expo').click(function(e){
+			var from_date = $('#from_date').val()
+			var to_date = $('#to_date').val()
+			
+			if (($('#from_date').val() == '')) {
+				bootbox.alert('Debe indicar Desde que Fecha quiere el Reporte', function() {	    
+					$('#from_date').css('border','1px solid #66AFE9');
+					$('#from_date').focus();
+				});
+			}
+			else if (($('#to_date').val() == '')) {
+				bootbox.alert('Debe indicar Hasta que Fecha quiere el Reporte', function() {	    
+					$('#to_date').css('border','1px solid #66AFE9');
+					$('#to_date').focus();
+				});
+			}else{
+				url = 'reporte_expo/'+from_date+'/'+to_date
+	            window.open(url); 
+			}
+            
+
+        });
+
+    });
+
+</script>
+
+<body style="background-image: url({{ STATIC_URL }}image/FONDO-WIFI-AZUL1.jpg); background-size: 100%; background-repeat: no-repeat">
+    <br/>
+    <br/>
+    <form method="post" id="form_cantidad" class="form-horizontal">
+        {% csrf_token %}
+        <center>
+            <div class="panel panel-default" style='width:90%'>
+				<br>
+                <div style="width:90%">
+					<a data-toggle="modal" class="modal_id" data-target="#myModal"><i class="fa fa-file-pdf-o text-red"></i></a>
+                    <table style="width:100%" border="0" align="center" cellspacing="1" id="list_cantidad" align="center"
+                           class="table table-bordered table-striped table-hover table-condensed dt-responsive table-responsive">
+                        <thead style="font-size: 13px">
+                            <tr class="info">
+                                <th  colspan=8 style="text-align: center">Listado de usuarios conectados a la wifi</th>
+                            </tr>
+                            <tr >
+                                <th style="text-align: center">Cantidad de Usuarios</th>
+                                <th style="text-align: center">Mb de subida consumidos</th>
+                                <th style="text-align: center">Mb de bajada consumidos</th>
+                                <th style="text-align: center">Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in cantidad_usu %}
+                            <tr style="font-size: 13px">
+                                <td>{{ c.cantidad }}</td>
+                                <td>{{ c.subida_usu }}</td>
+                                <td>{{ c.bajada_usu }}</td>
+                                <td>{{ c.hora }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+					<br/>
+                </div>
+            </div>
+            
+    </form>
+	<!-- Modal -->
+	<div class="modal fade" id="myModal" role="dialog">
+		 <div class="modal-dialog">
+			 <!-- Modal content-->
+			 <div class="modal-content">
+				 <div class="modal-header" style='background-color: #3c8dbc; color: white' >
+					 <button class="close" aria-label="Close" data-dismiss="modal" type="button">
+					 <span aria-hidden="true">×</span>
+					 </button>
+					 <h4 class="modal-title" style="font-weight:bold">Generar Pdf</h4>
+				 </div>
+				 <div class="modal-body">
+					 <div class="col-md-6">
+						<div class="form-group">
+							<label style="font-weight:bold">Desde</label>
+							<input id="from_date" placeholder="Seleccione Fecha Inicial" contenteditable="false" type="text">
+						</div><!-- /.form-group -->
+					 </div><!-- /.form-group -->
+					 <div class="col-md-6">
+						 <div class="form-group">
+							 <label style="font-weight:bold">Hasta</label>
+							 <input id="to_date" placeholder="Seleccione Fecha Final" contenteditable="false" type="text">
+						 </div><!-- /.form-group -->
+					 </div><!-- /.form-group -->
+					 <div class="col-md-6">
+						 <div class="form-group">
+							 <label style="font-weight:bold">&nbsp;</label><br>
+							 <button type="button" id="pdf_expo" style="font-weight: bold;font-size: 13px" class="btn btn-success " >
+								 &nbsp;<span class="fa fa-file-pdf-o"></span>&nbsp;Generar
+							 </button>
+						 </div><!-- /.form-group -->
+					 </div><!-- /.form-group -->
+				 </div>
+				 <br>
+				 <div class="modal-footer">
+					 
+				 </div>
+			 </div>
+		   
+		 </div>
+	 </div>
+                            
+</body>
+{% endblock %}

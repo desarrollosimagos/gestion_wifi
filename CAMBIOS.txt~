@@ -1,0 +1,16 @@
+
+
+FECHA: 17 DE SEPTIEMBRE 2015
+
+NUEVOS CAMBIOS
+
+>> añadido en models.py de bandeja de entrada
+>> cambio views.py de login
+>> cambio archivos models.py de registro
+>> creacion de grupo coordinador y comunicacion
+>> creacion de apps modelo de bandeja de entrada de solicitudes (Reportaje, Promocional)
+>> añadido apps de bandeja de entrada en archivo settings.py
+>> cambio template de registro y base.html y creacion de bandeja_entrada.html y registro_user.html
+>> cambio views.py , models.py y urls.py de registro
+>> añadir js de jquery.ptTimeSelect.js
+>> añadir css de jquery-ui.css y jquery.ptTimeSelect.css

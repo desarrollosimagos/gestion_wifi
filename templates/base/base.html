@@ -1,0 +1,120 @@
+<html lang="en">
+    <head>
+		<link rel="shortcut icon" href="{{STATIC_URL}}image/wifi.ico">
+        <meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <title>{% block title %}WIFI{% endblock title%}</title>
+		
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/bootstrap.min.css">
+	
+	<!-- Global CSS MENU -->
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/font-awesome.css">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/font-awesome.min.css">
+    
+    
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/style.css">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/dataTables.responsive.css">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/dataTables.bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/fancybox/jquery.fancybox.css">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/apprise.css">
+	
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/bootstrap-datepicker.css">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/select2/select2.css">
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/select2/select2-bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/jquery-ui.css">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/jquery.ptTimeSelect.css">
+	
+	<script src="{{STATIC_URL}}js/jquery-1.11.2.min.js"></script>
+	<!--<script src="{{STATIC_URL}}js/navigationDrawer.js"></script>-->
+	<script src="{{STATIC_URL}}js/fancybox/jquery.fancybox.js"></script>
+	<script src="{{STATIC_URL}}js/bootbox.js"></script>
+	<script src="{{STATIC_URL}}js/apprise.js"></script>    
+    <!--<script src="{{STATIC_URL}}js/json_response.js"></script>-->
+    <script src="{{STATIC_URL}}js/alphanumeric.js"></script>
+    <script src="{{STATIC_URL}}js/validaciones.js"></script>
+	<script src="{{STATIC_URL}}js/script.js"></script>
+	<script src="{{STATIC_URL}}js/jquery.dataTables.js"></script>
+	<script src="{{STATIC_URL}}js/bootstrap.min.js"></script>
+	<!-- Javascript MENU-->
+	
+	<script src="{{STATIC_URL}}js/dataTables.responsive.min.js"></script>
+	<script src="{{STATIC_URL}}js/bootstrap-datepicker.js"></script>
+	<script src="{{STATIC_URL}}js/bootstrap-datepicker.es.min.js"></script>
+	<script src="{{STATIC_URL}}js/dataTables.bootstrap.js"></script>
+	<script src="{{STATIC_URL}}js/footerfijo.js"></script>
+	<script src="{{STATIC_URL}}js/select2/select2.js"></script>
+    <script src="{{STATIC_URL}}js/select2/select2_locale_es.js"></script>
+	<script src="{{STATIC_URL}}js/jquery.ptTimeSelect.js"></script>
+	<script src="{{STATIC_URL}}js/tooltip.js"></script>
+	<script>
+
+		$(document).ready(function () {
+			
+			$('#title_menu').tooltip({
+				html: true,
+				placement: 'top',
+				title: '<span style="font-size:25px;">Desplegar menu</span>'
+			});
+		});
+    </script>
+
+
+<!-- Inserta esta etiqueta en la sección "head" o justo antes de la etiqueta "body" de cierre. -->
+
+	<style>
+		
+		.fancybox-overlay-fixed {
+			z-index: 1000
+        }
+		
+	    #footer{
+		height: 55px;
+		background-color: #FFFFFF;
+		position: fixed;
+		bottom: 0px;
+		width:100% !important;	      
+	    }
+
+	    input,select,textarea{
+	    	text-transform: uppercase;
+	    }
+		
+		.container-fluid {
+			width: 100%;
+			height: 6.5%;
+			background-color: #007F01;
+		}
+		
+		.div_contenedor{
+			border-radius: 15px 15px 15px 15px;
+			-moz-border-radius: 15px 15px 15px 15px;
+			-webkit-border-radius: 15px 15px 15px 15px;
+			border: 0px solid #000000;
+		}
+
+	</style>
+	{% block extra_head %}{% endblock extra_head%}
+	</head>
+	<body>
+	<!--<nav class="navbar navbar-default" style="width: 100%; color: white; font-size: 35px;-->
+	<!-- background: linear-gradient(#2985F4, #84BDFF); text-align: center">-->
+	<!--    Wifi EXPO ARAGUA 2015-->
+	<!--</nav>-->
+	<div align="center">
+		<img style="width: 100%" src="{{ STATIC_URL }}image/TOPE-WIFI-azul.jpg"/>
+	</div>
+  <!-- ========Bloque de elemento para renderizar las Vistas====== -->
+	<center>
+
+	    <div style='width:97.5%' class="div_contenedor">
+		{% block contenido %}{% endblock contenido %}
+	    </div>
+	</center>
+  <!-- =========================================================== -->
+  
+
+	<div id="footer" style="text-align:center;margin-bottom: -18px; margin-left: 0px">
+            <img src="{{STATIC_URL}}image/footer.png"/>
+        </div>
+<html>
